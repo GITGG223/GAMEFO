@@ -1,0 +1,1036 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GAMEFO</title>
+  <link rel="icon" href="logo.ico" type="image/x-icon">
+  <style>
+
+
+    li{
+      text-align: start;
+    }
+    :root{
+      --bg:#0f1724;
+      --accent:#06b6d4;
+      --splash-duration:1200ms;
+    }
+
+    :root{ --width: 720px; /* increased width */ --height: 220px; /* increased height */ }
+
+    html,body{
+      height:100%;
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+      background:var(--bg);
+      color:#fff;
+    }
+
+    #app {
+      opacity:0;
+      transform: translateY(8px);
+      transition: opacity 400ms ease, transform 400ms ease;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:2rem;
+      box-sizing:border-box;
+    }
+
+    #app.visible {
+      opacity:1;
+      transform: translateY(0);
+    }
+
+    .splash {
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.35));
+      z-index:9999;
+      overflow:hidden;
+      pointer-events:auto;
+    }
+
+    .splash__inner{
+      width:100%;
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
+
+    .splash img {
+      max-width:80%;
+      max-height:80%;
+      width:auto;
+      height:auto;
+      border-radius:12px;
+      box-shadow: 0 20px 60px rgba(2,6,23,0.7);
+      transform-origin:center;
+      transition: transform var(--splash-duration) cubic-bezier(.2,.9,.3,1),
+                  filter var(--splash-duration) cubic-bezier(.2,.9,.3,1),
+                  opacity var(--splash-duration) cubic-bezier(.2,.9,.3,1);
+      will-change: transform, filter, opacity;
+    }
+
+    .splash.splash--hide img {
+      transform: scale(1.25) rotate(-2deg);
+      filter: blur(6px) saturate(1.2) brightness(.9);
+      opacity:0;
+    }
+
+    .splash__brand {
+      position:absolute;
+      bottom:4%;
+      left:4%;
+      color:rgba(255,255,255,0.9);
+      font-weight:600;
+      letter-spacing:0.06em;
+      display:flex;
+      gap:0.6rem;
+      align-items:center;
+      font-size:0.95rem;
+      backdrop-filter: blur(6px);
+      padding:0.35rem 0.6rem;
+      border-radius:999px;
+      background:linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+    }
+
+    .splash__skip {
+      position:absolute;
+      top:3%;
+      right:3%;
+      background:rgba(0,0,0,0.45);
+      color:#fff;
+      border:1px solid rgba(255,255,255,0.06);
+      padding:0.45rem 0.7rem;
+      border-radius:8px;
+      cursor:pointer;
+      font-size:0.9rem;
+      transition: background 160ms ease, transform 120ms ease;
+    }
+    .splash__skip:active{ transform: translateY(1px); }
+    .splash__skip:hover{ background:rgba(0,0,0,0.6); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .splash img, .splash.splash--hide img {
+        transition:none;
+        transform:none;
+        filter:none;
+        opacity:1;
+      }
+      #app { transition:none; }
+    }
+
+        .item {
+      display: inline-block;
+      margin: 20px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .item img {
+      width: 100px;
+      height: 100px;
+      border-radius: 8px;
+      transition: transform 0.3s ease;
+    }
+
+    .item:hover img {
+      transform: scale(1.1);
+    }
+
+    .card {
+      position: absolute;
+      top: 110%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      background: #0f1724;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      padding: 15px;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 10;
+    }
+
+    .item:hover .card {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 18px;
+      color: #ffffff;
+    }
+
+    .card p {
+      margin: 5px 0;
+      font-size: 14px;
+      color: #666;
+    }
+
+
+    .ad-container { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%) translateY(0); width: var(--width); height: var(--height); background: var(--bg); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; display: flex; align-items: center; justify-content: center; transition: transform 300ms ease, opacity 200ms ease; z-index: 9999; border: 1px solid rgba(0,0,0,0.06); } /* Collapsed state moves the container down so only the arrow remains */ .ad-container.collapsed { transform: translateX(-50%) translateY(calc(var(--height) - 28px)); pointer-events: none; /* prevent clicks when collapsed except arrow */ opacity: 0.98; } /* Content inside ad */ .ad-content { padding: 12px; text-align: center; width: 100%; height: 100%; box-sizing: border-box; pointer-events: auto; } .ad-content img, .ad-content video { max-width: 100%; max-height: 100%; display:block; margin: 0 auto; object-fit: cover; border-radius: 6px; } .ad-text { font-size: 14px; color: var(--accent); } /* Small arrow handle */ .ad-handle { position: fixed; left: 50%; transform: translateX(-50%) rotate(0deg); width: 36px; height: 36px; bottom: 20px; border-radius: 50%; background: #ffffff; box-shadow: 0 6px 18px rgba(0,0,0,0.18); display:flex; align-items:center; justify-content:center; z-index:10000; cursor: pointer; transition: transform 250ms ease, bottom 250ms ease; border: 1px solid rgba(0,0,0,0.06); } /* Chevron inside handle */ .ad-handle::before{ content: ""; display:block; width: 10px; height: 10px; border-right: 2px solid var(--accent); border-bottom: 2px solid var(--accent); transform: rotate(45deg); transition: transform 250ms ease; } /* When container is collapsed, move handle down and rotate chevron up */ .ad-container.collapsed + .ad-handle { bottom: 8px; transform: translateX(-50%) rotate(180deg); } .ad-container:not(.collapsed) + .ad-handle { bottom: calc(20px + var(--height) + 6px); transform: translateX(-50%) rotate(0deg); } /* Make handle clickable even when container pointer-events none */ .ad-handle { pointer-events: auto; } /* Small responsive tweak */ @media (max-width:420px){ :root{ --width: 320px; --height: 110px; } }
+   
+
+    :root{
+      --gap-from-edge: 16px;
+      --btn-size: 48px;
+      --btn-bg: #0f1724;
+      --btn-border: #e3e6ea;
+      --btn-shadow: 0 6px 18px rgba(16,24,40,0.08);
+      --dot-color: #ffffff;
+      --dot-hover-color: #a60bff;
+      --menu-bg: #fff;
+      --menu-border: #e6e9ee;
+      --menu-shadow: 0 12px 30px rgba(16,24,40,0.12);
+      --item-hover-bg: #f5f8ff;
+      --item-color: #111827;
+      --transition-fast: 180ms cubic-bezier(.2,.9,.2,1);
+      --transition-slow: 260ms cubic-bezier(.2,.9,.2,1);
+    }
+    /* Fixed container top-right */
+    .menu-wrap {
+      position: fixed;
+      top: var(--gap-from-edge);
+      right: var(--gap-from-edge);
+      z-index: 9999;
+      display: inline-block;
+    }
+
+    /* Button */
+    .dots-btn {
+      width: var(--btn-size);
+      height: var(--btn-size);
+      border-radius: 12px;
+      border: 1px solid var(--btn-border);
+      background: var(--btn-bg);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--btn-shadow);
+      padding: 0;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .dots-btn:focus { outline: 3px solid rgba(11,132,255,0.18); outline-offset: 2px; }
+
+    /* Hover/active micro-interactions */
+    .dots-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(16,24,40,0.12); }
+    .dots-btn:active { transform: translateY(0); }
+
+    .dots {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      transition: transform var(--transition-slow);
+    }
+
+    /* Individual dots */
+    .dot {
+      width: 7px;
+      height: 7px;
+      background: var(--dot-color);
+      border-radius: 50%;
+      transition: transform var(--transition-fast), background var(--transition-fast), opacity var(--transition-fast);
+      transform-origin: center;
+    }
+
+    /* Hover effect: dots expand and change color */
+    .dots-btn:hover .dot {
+      transform: scale(1.25);
+      background: var(--dot-hover-color);
+    }
+
+    /* Slight stagger on hover for a polished feel */
+    .dot:nth-child(1){ transition-delay: 0ms; }
+    .dot:nth-child(2){ transition-delay: 30ms; }
+    .dot:nth-child(3){ transition-delay: 60ms; }
+
+    /* Dropdown menu */
+    .menu {
+      position: absolute;
+      right: 0;
+      margin-top: 10px;
+      min-width: 220px;
+      background: var(--menu-bg);
+      border: 1px solid var(--menu-border);
+      box-shadow: var(--menu-shadow);
+      border-radius: 12px;
+      padding: 6px;
+      display: none;
+      transform-origin: top right;
+      transition: opacity var(--transition-slow), transform var(--transition-slow);
+      opacity: 0;
+      transform: translateY(-6px) scale(0.98);
+    }
+
+    .menu.show {
+      display: block;
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .menu a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      color: var(--item-color);
+      text-decoration: none;
+      font-size: 14px;
+      border-radius: 8px;
+      transition: background var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .menu a:focus { outline: none; box-shadow: 0 0 0 4px rgba(11,132,255,0.08); }
+
+    /* Hover effect for menu items */
+    .menu a:hover {
+      background: var(--item-hover-bg);
+      transform: translateX(4px);
+    }
+
+    /* Optional small icon on the right of each item */
+    .menu .chev {
+      margin-left: auto;
+      width: 14px;
+      height: 14px;
+      display: inline-block;
+      opacity: 0.6;
+      transition: transform var(--transition-fast), opacity var(--transition-fast);
+    }
+
+    .menu a:hover .chev { transform: translateX(4px); opacity: 1; }
+
+    /* Caret */
+    .menu::before {
+      content: "";
+      position: absolute;
+      top: -6px;
+      right: 18px;
+      width: 10px;
+      height: 10px;
+      background: var(--menu-bg);
+      transform: rotate(45deg);
+      border-left: 1px solid var(--menu-border);
+      border-top: 1px solid var(--menu-border);
+      z-index: -1;
+    }
+
+    /* Responsive tweak */
+    @media (max-width:420px){
+      :root{ --btn-size:44px; }
+      .menu{ min-width:180px; right: 0; }
+    }
+
+    
+
+
+  </style>
+</head>
+<body>
+
+
+  <div id="splash" class="splash" aria-hidden="false">
+    <div class="splash__inner">
+
+      <img id="splashImage" src="https://static.wikia.nocookie.net/roblox-blox-piece/images/5/52/BloxFruitsHeader.png/revision/latest/scale-to-width-down/268?cb=20250731190159" alt="Welcome image" />
+      <div class="splash__brand">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+          <path d="M7 12h10" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span>Blox fruits</span>
+      </div>
+      <button id="skipBtn" class="splash__skip" aria-label="Skip splash">Skip</button>
+    </div>
+  </div>
+
+   
+<main id="app" role="main" aria-hidden="true">
+    <div style="max-width:900px;text-align:center;">
+      <h1 style="margin:0 0 0.5rem 0;font-size:clamp(1.6rem,3vw,2.4rem);"><br><br><br>INFO </h1>
+      <p style="margin:0 0 1.25rem 0; color:rgba(255,255,255,0.85);">
+          <nav id="global-navbar" aria-label="Main navigation">
+  <ul class="nav-list">
+    <li class="nav-item active"><a href="HOMEPAGE.html">Blox Fruits</a></li>
+    <li class="nav-item"><a href="Fightingstyle.html">Fighting Styles</a></li>
+    <li class="nav-item"><a href="/swords">Swords</a></li>
+    <li class="nav-item"><a href="/guns">Guns</a></li>
+    <li class="nav-item"><a href="/gears">Gears</a></li>
+  </ul>
+</nav>                   <!-- START WRIGHTING FROM HERE -->
+<br><br><br><br> <h1><b>List of Blox fruits</b></h1><br><h3>Rarity</h3><br>
+
+<ul>
+  <li>Common - 7</li>
+  <li>Uncommon - 6</li>
+  <li>Rare - 4</li>
+  <li>Legendary - 11</li>
+  <li>Mythical - 13</li>
+  <li>Total - 41</li>
+</ul>
+<br><br><br>
+<h3>Types</h3><br>
+<ul>
+  <li>21 -  Natural</li>
+  <li>11 -  Elemental</li>
+  <li>9  -  Beast</li>
+</ul>
+<br><br><br>  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/c/cb/Rocket_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027120039" alt="Rocket">
+    <div class="card">
+      <h3>Rocket</h3>
+      <h3>Common</h3>
+      <p>Type: Natural</p>
+      <p>Cost: $5000 or 50 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/8/88/Spin_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027120258" alt="Spin">
+    <div class="card">
+      <h3>Spin</h3>
+      <h3>Common</h3>
+      <p>Type: Natural</p>
+      <p>Cost: $7500 or 75 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/0/01/Blade_Fruit.png/revision/latest/scale-to-width-down/110?cb=20241215033604" alt="Blade">
+    <div class="card">
+      <h3>Blade</h3>
+      <h3>Common</h3>
+      <p>Type: Natural</p>
+      <p>Cost: $30000 or 100 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/8/8a/Spring_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027120418" alt="Spring">
+    <div class="card">
+      <h3>Spring</h3>
+      <h3>Common</h3>
+      <p>Type: Natural</p>
+      <p>Cost: $60000 or 180 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/4/43/Bomb_Fruit.png/revision/latest/scale-to-width-down/110?cb=20240304195914" alt="Bomb">
+    <div class="card">
+      <h3>Bomb</h3>
+      <h3>Common</h3>
+      <p>Type: Natural</p>
+      <p>Cost: $80000 or 220 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/7/7e/Smoke_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027120224" alt="Smoke">
+    <div class="card">
+      <h3>Smoke</h3>
+      <h3>Common</h3>
+      <p>Type: Elemental</p>
+      <p>Cost: $100000 or 250 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/c/ce/Spike_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027120251" alt="Spike">
+    <div class="card">
+      <h3>Spike</h3>
+      <h3>Common</h3>
+      <p>Type: Natural</p>
+      <p>Cost: $180000 or 380 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/c/c4/Flame_Fruit.png/revision/latest/scale-to-width-down/110?cb=20250421150742" alt="Flame">
+    <div class="card">
+      <h3>Flame</h3>
+      <h3>Uncommon</h3>
+      <p>Type: Elemental</p>
+      <p>Cost: $250000 or 550 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/c/c5/Ice_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027115604" alt="Ice">
+    <div class="card">
+      <h3>Ice</h3>
+      <h3>Uncommon</h3>
+      <p>Type: Elemental</p>
+      <p>Cost: $350000 or 750 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/7/72/Sand_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027120103" alt="Sand">
+    <div class="card">
+      <h3>Sand</h3>
+      <h3>Uncommon</h3>
+      <p>Type: Elemental</p>
+      <p>Cost: $420000 or 850 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/5/5c/Dark_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027115358" alt="Dark">
+    <div class="card">
+      <h3>Dark</h3>
+      <h3>Uncommon</h3>
+      <p>Type: Elemental</p>
+      <p>Cost: $500000 or 950 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/5/53/Eagle_Fruit.png/revision/latest/scale-to-width-down/110?cb=20250418030931" alt="Eagle">
+    <div class="card">
+      <h3>Eagle</h3>
+      <h3>Uncommon</h3>
+      <p>Type: Beast</p>
+      <p>Cost: $550000 or 975 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/8/88/Diamond_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027115405" alt="Diamond">
+    <div class="card">
+      <h3>Diamond</h3>
+      <h3>Uncommon</h3>
+      <p>Type: Natural</p>
+      <p>Cost: $600000 or 1000 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/8/83/Light_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027115623" alt="Light">
+    <div class="card">
+      <h3>Light</h3>
+      <h3>Rare</h3>
+      <p>Type: Elemental</p>
+      <p>Cost: $650000 or 1100 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/5/5c/Rubber_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027120046" alt="Rubber">
+    <div class="card">
+      <h3>Rubber</h3>
+      <h3>Rare</h3>
+      <p>Type: Natural</p>
+      <p>Cost: $750000 or 1200 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/8/8c/Ghost_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027115804" alt="Ghost">
+    <div class="card">
+      <h3>Ghost</h3>
+      <h3>Rare</h3>
+      <p>Type: Natural</p>
+      <p>Cost: $940000 or 1275 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/2/27/Magma_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027115640" alt="Magma">
+    <div class="card">
+      <h3>Magma</h3>
+      <h3>Rare</h3>
+      <p>Type: Elemental</p>
+      <p>Cost: $960000 or 1300 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/4/42/Quake_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027115754" alt="Quake">
+    <div class="card">
+      <h3>Quake</h3>
+      <h3>Legendary</h3>
+      <p>Type: Natural</p>
+      <p>Cost: $1000000 or 1500 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/d/df/Buddha_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027115325" alt="Buddha">
+    <div class="card">
+      <h3>Buddha</h3>
+      <h3>Legendary</h3>
+      <p>Type: Beast</p>
+      <p>Cost: $1200000 or 1650 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/b/b3/Love_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027115630" alt="love">
+    <div class="card">
+      <h3>Love</h3>
+      <h3>Legendary</h3>
+      <p>Type: Natural</p>
+      <p>Cost: $1300000 or 1700 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/4/44/Creation_Fruit.png/revision/latest/scale-to-width-down/110?cb=20250913215446" alt="Creation">
+    <div class="card">
+      <h3>Creation</h3>
+      <h3>Legendary</h3>
+      <p>Type: Natural</p>
+      <p>Cost: $1400000 or 1750 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/6/61/Spider_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027120241" alt="Spider">
+    <div class="card">
+      <h3>Spider</h3>
+      <h3>Legendary</h3>
+      <p>Type: Natural</p>
+      <p>Cost: $1500000 or 1800 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/b/ba/Sound_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027120231" alt="Sound">
+    <div class="card">
+      <h3>Sound</h3>
+      <h3>Legendary</h3>
+      <p>Type: Natural</p>
+      <p>Cost: $1700000 or 1900 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/f/fc/Phoenix_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027115733" alt="Phoenix">
+    <div class="card">
+      <h3>Phoenix</h3>
+      <h3>Legendary</h3>
+      <p>Type: Beast</p>
+      <p>Cost: $1800000 or 2000 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/8/8a/Portal_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027115746" alt="Portal">
+    <div class="card">
+      <h3>Portal</h3>
+      <h3>Legendary</h3>
+      <p>Type: Natural</p>
+      <p>Cost: $1900000 or 2000 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/7/78/Lightning_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027120057" alt="Lightning">
+    <div class="card">
+      <h3>Lightning</h3>
+      <h3>Legendary</h3>
+      <p>Type: Elemental</p>
+      <p>Cost: $2100000 or 2100 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/4/40/Pain_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027115724" alt="Pain">
+    <div class="card">
+      <h3>Pain</h3>
+      <h3>Legendary</h3>
+      <p>Type: Natural</p>
+      <p>Cost: $2300000 or 2200 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/c/c9/Blizzard_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027115313" alt="Blizzard">
+    <div class="card">
+      <h3>Blizzard</h3>
+      <h3>Legendary</h3>
+      <p>Type: Elemental</p>
+      <p>Cost: $2400000 or 2250 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/5/5f/Gravity_Fruit.png/revision/latest/scale-to-width-down/110?cb=20250418030958" alt="Gravity">
+    <div class="card">
+      <h3>Gravity</h3>
+      <h3>Mythical</h3>
+      <p>Type: Natural</p>
+      <p>Cost: $2500000 or 2300 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/9/95/Mammoth_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027115702" alt="Mammoth">
+    <div class="card">
+      <h3>Mammoth</h3>
+      <h3>Mythical</h3>
+      <p>Type: Beast</p>
+      <p>Cost: $2700000 or 2350 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/d/d9/T-Rex_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231226191220" alt="T-Rex">
+    <div class="card">
+      <h3>T-Rex</h3>
+      <h3>Mythical</h3>
+      <p>Type: Beast</p>
+      <p>Cost: $2700000 or 2350 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/0/02/Dough_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231210155057" alt="Dough">
+    <div class="card">
+      <h3>Dough</h3>
+      <h3>Mythical</h3>
+      <p>Type: Elemental</p>
+      <p>Cost: $2800000 or 2400 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/5/58/Shadow_Fruit.png/revision/latest/scale-to-width-down/110?cb=20241229033053" alt="Shadow">
+    <div class="card">
+      <h3>Shadow</h3>
+      <h3>Mythical</h3>
+      <p>Type: Natural</p>
+      <p>Cost: $2900000 or 2425 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/d/d2/Venom_Fruit.png/revision/latest/scale-to-width-down/110?cb=20231027120425" alt="Venom">
+    <div class="card">
+      <h3>Venom</h3>
+      <h3>Mythical</h3>
+      <p>Type: Natural</p>
+      <p>Cost: $3000000 or 2450 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/e/ed/Gas_Fruit.png/revision/latest/scale-to-width-down/110?cb=20241223162315" alt="Gas">
+    <div class="card">
+      <h3>Gas</h3>
+      <h3>Mythical</h3>
+      <p>Type: Elemental</p>
+      <p>Cost: $3200000 or 2500 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/6/66/Spirit_Fruit.png/revision/latest/scale-to-width-down/110?cb=20240304190559" alt="Sprit">
+    <div class="card">
+      <h3>Spirit</h3>
+      <h3>Mythical</h3>
+      <p>Type: Natural</p>
+      <p>Cost: $3400000 or 2550 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/1/14/Tiger_Fruit.png/revision/latest/scale-to-width-down/110?cb=20251101005924" alt="Tiger">
+    <div class="card">
+      <h3>Tiger</h3>
+      <h3>Mythical</h3>
+      <p>Type: Beast</p>
+      <p>Cost: $5000000 or 3000 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/2/2f/Yeti_Fruit.png/revision/latest/scale-to-width-down/110?cb=20241226020230" alt="Yeti">
+    <div class="card">
+      <h3>Yeti</h3>
+      <h3>Mythical</h3>
+      <p>Type: Beast </p>
+      <p>Cost: $5000000 or 3000 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/6/65/Kitsune_Fruit.png/revision/latest/scale-to-width-down/110?cb=20241223162956" alt="Kitsune">
+    <div class="card">
+      <h3>Kitsune</h3>
+      <h3>Mythical</h3>
+      <p>Type: Beast</p>
+      <p>Cost: $8000000 or 4000 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/1/19/Control_Fruit.png/revision/latest/scale-to-width-down/110?cb=20251223165924" alt="Control">
+    <div class="card">
+      <h3>Control</h3>
+      <h3>Mythical</h3>
+      <p>Type: Natural</p>
+      <p>Cost: $9000000 or 4000 Robux</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="https://static.wikia.nocookie.net/roblox-blox-piece/images/2/29/Dragon_Fruit.png/revision/latest/scale-to-width-down/110?cb=20241218114129" alt="Dragon">
+    <div class="card">
+      <h3>Dragon</h3>
+      <h3>Mythical</h3>
+      <p>Type: Beast</p>
+      <p>Cost: $15000000 or 5000 Robux</p>
+    </div>
+  </div>
+
+
+      </p> 
+    </div>
+  </main> 
+
+  <script>
+    (function(){
+      'use strict';
+
+      const splash = document.getElementById('splash');
+      const app = document.getElementById('app');
+      const skipBtn = document.getElementById('skipBtn');
+      const img = document.getElementById('splashImage');
+
+      const SPLASH_DURATION = 1200; // must match CSS --splash-duration
+      const VISIBLE_DELAY = 900; // how long splash stays visible before animating out
+
+      function revealApp() {
+        app.classList.add('visible');
+        app.setAttribute('aria-hidden','false');
+      }
+
+      function hideSplash() {
+        splash.classList.add('splash--hide');
+        setTimeout(() => {
+          splash.style.display = 'none';
+          splash.setAttribute('aria-hidden','true');
+          revealApp();
+        }, SPLASH_DURATION);
+      }
+
+      function skipImmediately() {
+        splash.style.display = 'none';
+        splash.setAttribute('aria-hidden','true');
+        revealApp();
+      }
+
+      skipBtn.addEventListener('click', () => {
+        skipImmediately();
+      });
+
+      // Determine navigation type
+      function getNavigationType() {
+        // Preferred modern API
+        try {
+          const entries = performance.getEntriesByType && performance.getEntriesByType('navigation');
+          if (entries && entries.length > 0 && entries[0].type) {
+            return entries[0].type; // 'navigate', 'reload', 'back_forward', 'prerender'
+          }
+        } catch (e) { /* ignore */ }
+
+        // Fallback to deprecated API
+        try {
+          if (performance.navigation) {
+            const t = performance.navigation.type;
+            // 0 = TYPE_NAVIGATE, 1 = TYPE_RELOAD, 2 = TYPE_BACK_FORWARD, 255 = TYPE_RESERVED
+            if (t === 1) return 'reload';
+            if (t === 2) return 'back_forward';
+            return 'navigate';
+          }
+        } catch (e) { /* ignore */ }
+
+        // If we can't detect, default to showing splash (safe choice)
+        return 'unknown';
+      }
+
+      // Main logic on load
+      window.addEventListener('load', () => {
+        // If user prefers reduced motion, skip animations and splash
+        const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (prefersReduced) {
+          skipImmediately();
+          return;
+        }
+
+        const navType = getNavigationType();
+
+        // If this load is a reload, skip the splash (user requested)
+        if (navType === 'reload') {
+          skipImmediately();
+          return;
+        }
+
+        // For navigate and back_forward, show the splash
+        // For unknown, we show the splash to be safe
+        app.setAttribute('aria-hidden','true');
+
+        const startHide = () => {
+          setTimeout(() => {
+            hideSplash();
+          }, VISIBLE_DELAY);
+        };
+
+        if (img.complete) {
+          startHide();
+        } else {
+          img.addEventListener('load', startHide, { once: true });
+          // fallback in case image load never fires
+          setTimeout(startHide, 2500);
+        }
+      });
+
+      // Extra: if user opens the page in a new tab (fresh navigation), navType will be 'navigate' and splash shows.
+      // If they reload the tab, navType will be 'reload' and splash is skipped.
+      // If they use back/forward, navType will be 'back_forward' and splash shows.
+    })();
+  </script>
+
+  <div class="ad-container" id="adContainer" role="region" aria-label="Advertisement">
+    <div class="ad-content" id="adContent">
+      <!-- Replace this with your ad markup or media -->
+      <div class="ad-text"><strong>Sponsored</strong> Your ads Here<br>Contact 8500110789<a href="https://example.com">
+  <img src="" alt="" style="cursor:pointer;">
+</a>
+</div>
+    </div>
+  </div>
+
+  <!-- Arrow handle placed after container so sibling selector works -->
+  <div class="ad-handle" id="adHandle" role="button" aria-label="Toggle advertisement" aria-pressed="false"></div>
+
+<script>
+  (function(){
+    const container = document.getElementById('adContainer');
+    const handle = document.getElementById('adHandle');
+
+    // Toggle function
+    function toggle(collapsed){
+      const isCollapsed = typeof collapsed === 'boolean' ? collapsed : !container.classList.contains('collapsed');
+      if(isCollapsed){
+        container.classList.add('collapsed');
+        handle.setAttribute('aria-pressed','true');
+      } else {
+        container.classList.remove('collapsed');
+        handle.setAttribute('aria-pressed','false');
+      }
+    }
+
+    // Click handle to toggle open/close
+    handle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggle();
+    });
+
+    // Optional: clicking the ad itself can also close it if desired
+    // Comment out the next block if you want ad clicks to be interactive
+    container.addEventListener('click', (e) => {
+      // prevent closing when clicking interactive elements inside ad
+      if(e.target.closest('a, button, input, video')) return;
+      toggle();
+    });
+
+    // Initialize as open; to start collapsed, call toggle(true) here
+    toggle(false);
+  })();
+</script>
+
+
+<div class="menu-wrap" id="menuWrap">
+    <button class="dots-btn" id="menuButton" aria-haspopup="true" aria-expanded="false" aria-controls="menuList" title="Open menu">
+      <span class="dots" aria-hidden="true">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </span>
+      <span class="sr-only" style="position:absolute;left:-9999px">Open options</span>
+    </button>
+
+    <nav id="menuList" class="menu" role="menu" aria-labelledby="menuButton">
+      <a href="Help.html" role="menuitem" tabindex="-1">
+        Help
+        <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="Adcenter.html" role="menuitem" tabindex="-1">
+        Ad Center
+        <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </nav>
+  </div>
+
+  <script>
+    const btn = document.getElementById('menuButton');
+    const menu = document.getElementById('menuList');
+
+    function toggleMenu(show) {
+      const willShow = typeof show === 'boolean' ? show : !menu.classList.contains('show');
+      menu.classList.toggle('show', willShow);
+      btn.setAttribute('aria-expanded', willShow ? 'true' : 'false');
+      if (willShow) {
+        const first = menu.querySelector('a');
+        if (first) first.focus();
+      }
+    }
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMenu();
+    });
+
+    // Close when clicking outside
+    document.addEventListener('click', () => toggleMenu(false));
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') toggleMenu(false);
+    });
+
+    // Prevent clicks inside menu from closing immediately
+    menu.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    // Close menu after navigation starts (useful for SPA or to remove menu quickly)
+    menu.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => toggleMenu(false));
+    });
+  </script>
+
+
+
+
+
+
+
+
+
+
+<br><br><br><br><br><br><br><br><br><br><br>
+  
+</body>
+</html>

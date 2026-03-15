@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GAMEFO</title>
+  <link rel="icon" href="logo.ico" type="image/x-icon">
+  <style>
+    :root{
+      --gap: 18px;
+      --card-bg: #ffffff;
+      --card-border: #e6e6e6;
+      --accent: #1a73e8;
+      --shadow: 0 6px 18px rgba(20,20,20,0.06);
+      --radius: 12px;
+    }
+
+    body{
+      font-family: Inter, system-ui, Arial, sans-serif;
+      margin: 32px;
+      background:#0f1724;
+      color: #111;
+    }
+
+    .container{
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1{
+      margin: 0 0 18px 0;
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    /* Grid of large rectangles */
+    .grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: var(--gap);
+      align-items: stretch;
+    }
+
+    /* Card style */
+    .card{
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 28px;
+      min-height: 160px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      text-decoration: none;
+      color: inherit;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+
+    .card:hover, .card:focus{
+      transform: translateY(-6px);
+      box-shadow: 0 14px 30px rgba(20,20,20,0.08);
+      border-color: var(--accent);
+      outline: none;
+    }
+
+    .card .title{
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .card .desc{
+      font-size: 14px;
+      color: #555;
+      line-height: 1.35;
+    }
+
+    /* Optional: large featured card spanning two columns on wide screens */
+    .card.featured{
+      grid-column: span 2;
+      min-height: 220px;
+     background:#0f1724; 
+    }
+
+    @media (max-width:700px){
+      .card.featured{ grid-column: auto; }
+    }
+
+    /* Small helper for keyboard focus */
+    .card:focus-visible{
+      box-shadow: 0 0 0 4px rgba(26,115,232,0.12);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    
+
+    <div class="grid">
+      <!-- Each anchor wraps the whole rectangle so clicking anywhere redirects -->
+      <a class="card featured" href="bloxfruits/HOMEPAGE.html" target="_self" aria-label="bloxfruits">
+        <div class="title"></div>
+        <div class="desc"><img src=https://thespike-strapi-cms.s3.us-east-1.amazonaws.com/GUIDES_CATEGORIES_blox_fruits_5a7032b754.jpg height="300px"></div>
+      </a>
+
+      <a class="card" href="https://example.com/electronics" target="_self" aria-label="Electronics">
+        <div class="title">Comming soon</div>
+        <div class="desc"></div>
+      </a>
+
+      <a class="card" href="https://example.com/home" target="_self" aria-label="Home and Kitchen">
+        <div class="title">Comming soon</div>
+        <div class="desc"></div>
+      </a>
+
+      <a class="card" href="https://example.com/fashion" target="_self" aria-label="Fashion">
+        <div class="title">Comming soon</div>
+        <div class="desc"></div>
+      </a>
